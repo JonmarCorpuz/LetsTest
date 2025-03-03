@@ -1,0 +1,13 @@
+# Wazuh Manager
+apiVersion: v1
+kind: Service
+metadata:
+  name: wazuh-manager-service
+spec:
+  type: NodePort
+  ports:
+    - port: 55000
+      targetPort: 55000
+      nodePort: 30500
+  selector:
+    app: wazuh-manager

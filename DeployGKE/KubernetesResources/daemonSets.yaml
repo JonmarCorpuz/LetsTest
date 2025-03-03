@@ -1,0 +1,32 @@
+# Wazuh Agent
+apiVersion: apps/v1   # Specifies the API version for the DaemonSet
+kind: DaemonSet       # Specifies the kind of Kubernetes resource, here a DaemonSet
+metadata:
+  name: wazuh-agent   # Name of the DaemonSet
+  namespace: kube-system  # Namespace where the DaemonSet is deployed, using 'kube-system' for system services
+spec:
+  selector:           # Selector to identify the pods that belong to the DaemonSet
+    matchLabels:
+      name: wazuh-agent  # Label that must be present on the pods that belong to this DaemonSet
+  template:           # Template for the pods managed by the DaemonSet
+    metadata:
+      labels:
+        name: wazuh-agent  # Labels assigned to each pod created by this DaemonSet
+    spec:
+      hostNetwork: true    # Allows the pods to use the node's network stack which is necessary for network monitoring
+      containers:
+      - name: wazuh-agent   # Name of the container within each pod
+        image: your-registry/wazuh-agent:latest  # The container image to use, including the registry location and tag
+        volumeMounts:        # Defines storage volumes mounted within the container
+        - name: ossec-config  # Reference to the config volume, mounted into the container
+          mountPath: /var/ossec/etc  # Mount path inside the container where configuration files are located
+        - name: ossec-logs    # Reference to the logs volume, mounted into the container
+          mountPath: /var/ossec/logs # Mount path inside the container where logs are stored
+      volumes:           # Defines volumes that can be mounted by containers in this pod
+      - name: ossec-config   # Name of the volume for configuration files
+        configMap:
+          name: wazuh-agent-config  # Name of the ConfigMap that contains the configuration files
+      - name: ossec-logs    # Name of the volume for logs
+        hostPath:          # HostPath volume type allows you to mount a file or directory from the host node's filesystem into a pod
+          path: /var/ossec/logs  # Path on the host where logs are stored
+          type: DirectoryOrCreate  # Ensures the directory is created if it does not already exist

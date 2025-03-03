@@ -1,0 +1,25 @@
+# Wazuh Manager Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: wazuh-manager-config
+data:
+  ossec.conf: |
+    <ossec_config>
+      <global>
+        <jsonout_output>yes</jsonout_output>
+        <alerts_log>yes</alerts_log>
+      </global>
+      <rules>
+        <include>rules_config.xml</include>
+      </rules>
+      <syscheck>
+        <frequency>43200</frequency>
+      </syscheck>
+      <rootcheck>
+        <disabled>no</disabled>
+      </rootcheck>
+      <remote>
+        <connection>secure</connection>
+      </remote>
+    </ossec_config>

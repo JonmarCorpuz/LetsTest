@@ -1,0 +1,33 @@
+# Wazuh Manager
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wazuh-manager
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wazuh-manager
+  template:
+    metadata:
+      labels:
+        app: wazuh-manager
+    spec:
+      containers:
+      - name: wazuh-manager
+        image: wazuh/wazuh-manager:latest
+        ports:
+        - containerPort: 55000
+        volumeMounts:
+        - name: config
+          mountPath: /var/ossec/etc/ossec.conf
+          subPath: ossec.conf
+        - name: data
+          mountPath: /var/ossec/data
+      volumes:
+      - name: config
+        configMap:
+          name: wazuh-manager-config
+      - name: data
+        persistentVolumeClaim:
+          claimName: wazuh-manager-pvc
