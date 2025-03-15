@@ -1,0 +1,72 @@
+version: '3.8'
+services:
+  mysql:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: mydatabase
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      mynetwork:
+        ipv4_address: 172.20.0.2
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 400M
+
+  nginx:
+    build: 
+      context: ./tp1-1  # Remplacez par le nom de votre image nginx personnalisée de la tâche-1
+    ports:
+      - "5000:80"
+    volumes:
+      - ./nginx-data:/var/www/html  # Assurez-vous que ce répertoire existe
+    networks:
+      mynetwork:
+        ipv4_address: 172.20.0.3
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 400M
+
+  jenkins:
+    image: jenkins/jenkins:lts
+    ports:
+      - "9005:8080"
+    networks:
+      mynetwork:
+        ipv4_address: 172.20.0.4
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 1G
+
+  sonarqube:
+    image: sonarqube
+    ports:
+      - "9006:9000"
+    networks:
+      mynetwork:
+        ipv4_address: 172.20.0.5
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 1G
+
+volumes:
+  mysql-data:
+  nginx-data:
+
+networks:
+  mynetwork:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
